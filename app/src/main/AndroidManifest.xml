@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.CashKing"
+        tools:targetApi="31">
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" />
+
+        <property
+            android:name="android.adservices.AD_SERVICES_CONFIG"
+            android:resource="@xml/ga_ad_services_config"
+            tools:replace="android:resource"/>
+
+        <meta-data
+            android:name="applovin.sdk.key"
+            android:value="OWtU1q845P4UdcDuFrM4Mz1BEdsn5UgzT1ly14TTRmW7TXxTqObXUQhscppTb05vszTXmMG2GUgeSBkoARH5xW" />
+            <!-- android:value="FsFGfiHBrph8vVPEZ8TbVlSRmdRWz8yhDCrR47HxWus9EzSmWy9qDwgKxkPaxsKf3cbd6h_TGoGI40fehXk9Af" -->
+
+        <meta-data
+            android:name="com.onesignal.NotificationOpenedHandler"
+            android:value="com.cashlord.earn" />
+
+        <meta-data
+            android:name="com.onesignal.NotificationChannel"
+            android:value="Default" />
+
+        <activity
+            android:name="com.cashlord.earn.csm.ActivitySplash"
+            android:exported="true"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar.FullScreen">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity> -->
+    </application>
+
+</manifest>
