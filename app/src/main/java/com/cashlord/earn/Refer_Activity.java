@@ -7,6 +7,7 @@ import static com.cashlord.earn.helper.Constatnt.Base_Url;
 import static com.cashlord.earn.helper.Constatnt.TASK;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -79,6 +80,7 @@ public class Refer_Activity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 ContextExtensions.showLongToast(Refer_Activity.this, error.toString());
                 //  hidepDialog();
+                Log.e("ON_ERROR_Refer_Activity", "onErrorResponse: ", error);
             }
         }) {
             @Override

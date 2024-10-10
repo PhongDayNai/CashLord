@@ -4,7 +4,7 @@ public class Constatnt {
 
     //Admin url
     public static String Main_Url = "https://mmo.nguyenductien.net/"; //end with slash /
-    public static String Base_Url = Main_Url + "index.php";
+    public static String Base_Url = Main_Url + "api.php";
     public static String WHEEL_URL = Main_Url + "img/wheel.gif";
     public static String RESET_PASSWORD = Main_Url + "reset_pass.php";
     public static String FORGOT_PASSWORD = Main_Url + "forget_pass.php";
@@ -15,10 +15,10 @@ public class Constatnt {
     public static final String ALPHA_NUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     public static final String API = "1";
     public static final String ACCESS_KEY = "access_key";
+    public static final String ACCESS_Value = "05d0a43a34232da067f2db4e7335fe40770edc4a619f7e5eaf9a2ef5d9384a3a";
     public static final String TASK = "task";
     public static final String LEADER = "leader";
     public static final String REWARD = "reward";
-    public static final String ACCESS_Value = "05d0a43a34232da067f2db4e7335fe40770edc4a619f7e5eaf9a2ef5d9384a3a";
     public static final String NAME = "name";
     public static final String USERNAME = "username";
     public static final String EMAIL = "email";

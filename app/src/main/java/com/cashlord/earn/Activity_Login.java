@@ -331,8 +331,6 @@ public class Activity_Login extends AppCompatActivity {
 
     //03. Check User
     public void check_user(String e, String password1,boolean isCustomLogin) {
-
-
         showpDialog();
         if (isConnected(Activity_Login.this)) {
             JsonRequest jsonReq = new JsonRequest(Request.Method.POST, Base_Url, null,
@@ -364,6 +362,7 @@ public class Activity_Login extends AppCompatActivity {
                 public void onErrorResponse(VolleyError error) {
                     ContextExtensions.showLongToast(getApplicationContext(), "Check User " + e.toString());
                     hidepDialog();
+                    Log.e("ON_ERROR_Activity_Login", "onErrorResponse: ", error);
                 }
             }) {
                 @Override
@@ -382,27 +381,22 @@ public class Activity_Login extends AppCompatActivity {
 
 
     public class CustomOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
-
         public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
             spinner_code = parent.getItemAtPosition(pos).toString();
-
         }
 
         @Override
         public void onNothingSelected(AdapterView<?> arg0) {
             // TODO Auto-generated method stub
         }
-
     }
 
     @Override
     public void onStart() {
         super.onStart();
-
     }
 
     public void refer_dialog() {
-
         AlertDialog.Builder alert = new AlertDialog.Builder(Activity_Login.this);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View dialogView = inflater.inflate(R.layout.accept_term, null);
@@ -420,6 +414,7 @@ public class Activity_Login extends AppCompatActivity {
                 }
             }
         });
+
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -440,8 +435,6 @@ public class Activity_Login extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
-
-
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
@@ -462,7 +455,6 @@ public class Activity_Login extends AppCompatActivity {
                             String newString = email.replace("@gmail.com", "");
                             username = newString;
                             check_user(email, password,false);
-
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -471,7 +463,6 @@ public class Activity_Login extends AppCompatActivity {
                     }
                 });
     }
-
 
     public void register(final String enter_phone, final String username, final String name, final String email, final Uri pro) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -516,6 +507,7 @@ public class Activity_Login extends AppCompatActivity {
                 public void onErrorResponse(VolleyError error) {
                     ContextExtensions.showLongToast(getApplicationContext(),"Please check your internet connection!");
                     hidepDialog();
+                    Log.e("ON_ERROR_Activity_Login", "onErrorResponse: ", error);
                 }
             }) {
                 @Override
@@ -580,6 +572,7 @@ public class Activity_Login extends AppCompatActivity {
                 public void onErrorResponse(VolleyError error) {
                     ContextExtensions.showShortToast(getApplicationContext(), getText(R.string.error_data_loading).toString());
                     hidepDialog();
+                    Log.e("ON_ERROR_Activity_Login", "onErrorResponse: ", error);
                 }
             }) {
                 @Override

@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.KeyEvent;
 import android.webkit.CookieManager;
 import android.webkit.WebSettings;
@@ -106,6 +107,7 @@ public class Just_base extends AppCompatActivity {
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
+                            Log.e("ON_ERROR_Just_base", "onErrorResponse: ", error);
                         }
                     }) {
                 @Override
@@ -167,6 +169,7 @@ public class Just_base extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        Log.e("ON_ERROR_Just_base", "onErrorResponse: ", error);
                     }
                 }) {
             @Override
@@ -233,7 +236,9 @@ public class Just_base extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         if (dialog.isShowing()){
-                            dialog.dismiss();}
+                            dialog.dismiss();
+                        }
+                        Log.e("ON_ERROR_Just_base", "onErrorResponse: ", error);
                     }
                 }) {
             @Override

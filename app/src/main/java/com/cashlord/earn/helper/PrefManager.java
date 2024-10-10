@@ -10,6 +10,7 @@ import static com.cashlord.earn.helper.Constatnt.DAILY_CHECKIN_API;
 import static com.cashlord.earn.helper.Constatnt.DAILY_TYPE;
 import static com.cashlord.earn.helper.Constatnt.GET_USER;
 import static com.cashlord.earn.helper.Constatnt.ID;
+import static com.cashlord.earn.helper.Constatnt.Main_Url;
 import static com.cashlord.earn.helper.Constatnt.SPIN_TYPE;
 import static com.cashlord.earn.helper.Constatnt.USERNAME;
 
@@ -41,6 +42,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.JsonRequest;
 import com.cashlord.earn.MainActivity;
 import com.cashlord.earn.OnScratchComplete;
@@ -66,7 +68,7 @@ public class PrefManager {
     private static SharedPreferences sharedPreferences;
     private static SharedPreferences.Editor editor;
 
-    static Context context;
+    private Context context;
     public static AppCompatActivity activity;
     private static final String SETTING_PREF = "settings_pref";
 
@@ -169,14 +171,13 @@ public class PrefManager {
 
     public static void user_points(TextView t) {
         final String[] s = {"0"};
-        JsonRequest stringRequest = new JsonRequest(Request.Method.POST, Base_Url, null,
+        JsonRequest<JSONObject> stringRequest = new JsonRequest<JSONObject>(Request.Method.POST, Base_Url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
                             if (response.getString("error").equalsIgnoreCase("false")) {
                                 t.setText(response.getString("points"));
-
                             } else {}
                         } catch (Exception e) {
                             ContextExtensions.showLongToast(t.getContext(), e.getMessage());
@@ -199,12 +200,24 @@ public class PrefManager {
                 try {
                     String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
                     return Response.success(new JSONObject(jsonString), HttpHeaderParser.parseCacheHeaders(response));
-                } catch (UnsupportedEncodingException | JSONException e) {
+                } catch (JSONException e) {
+                    Log.e("ERROR", "JSONException: ", e);
+                    // Trả về phản hồi lỗi hoặc xử lý theo cách khác
+                    return Response.error(new ParseError(e));
+                } catch (UnsupportedEncodingException e) {
+                    Log.e("ERROR", "UnsupportedEncodingException: ", e);
+                    return Response.error(new ParseError(e));
+                } catch (Exception e) {
+                    Log.e("ERROR", "Unexpected Error: ", e);
                     return Response.error(new ParseError(e));
                 }
             }
         };
-        AppController.getInstance().addToRequestQueue(stringRequest);
+        if (AppController.getInstance() != null) {
+            AppController.getInstance().addToRequestQueue(stringRequest);
+        } else {
+            Log.e("ERROR", "AppController instance is null");
+        }
     }
 
     private static void updateAppLovinConfig(Context context, JSONObject data) {
@@ -221,9 +234,8 @@ public class PrefManager {
         }
     }
 
-
     public static void A(Context context) {
-        JsonRequest stringRequest = new JsonRequest(Request.Method.POST, Base_Url, null,
+        JsonRequest<JSONObject> stringRequest = new JsonRequest<JSONObject>(Request.Method.POST, Base_Url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -234,21 +246,22 @@ public class PrefManager {
                                         ContextExtensions.showShortToast(context, "Please disconnect the vpn and reopen the app!");
                                         ((Activity) context).finish();
                                     } else {
+                                        Log.d("ALGORATHAM", "Calling algoratham with data: " + response.getJSONObject("data").toString());
                                         algoratham(context, response.getJSONObject("data"));
                                     }
                                 } else {
+                                    Log.d("ALGORATHAM", "Calling algoratham with data: " + response.getJSONObject("data").toString());
                                     algoratham(context, response.getJSONObject("data"));
                                 }
                             }
-                        } catch (Exception e) {
-
-                        }
+                        } catch (Exception e) {}
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e("ON_ERROR", "onErrorResponse: " + error.getMessage());
+                        Log.e("ON_ERROR_help_PrefManager_A", "onErrorResponse: " + error.getMessage());
+                        Log.e("ON_ERROR_help_PrefManager_A", "onErrorResponse: ", error);
                     }
                 }) {
             @Override
@@ -261,14 +274,48 @@ public class PrefManager {
             @Override
             protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
                 try {
-                    String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
-                    return Response.success(new JSONObject(jsonString), HttpHeaderParser.parseCacheHeaders(response));
-                } catch (UnsupportedEncodingException | JSONException e) {
+                    String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers, "UTF-8"));
+                    Log.d("RESPONSE", "Response: " + jsonString);  // Log toàn bộ phản hồi từ server
+
+                    int statusCode = response.statusCode;
+                    Log.d("RESPONSE", "Status Code: " + statusCode);  // Log status code
+
+                    // Kiểm tra mã trạng thái HTTP
+                    if (statusCode != 200) {
+                        return Response.error(new ParseError(new Exception("Unexpected status code: " + statusCode)));
+                    }
+
+                    // Kiểm tra phản hồi có thật sự rỗng
+                    if (jsonString.isEmpty()) {
+                        Log.e("ERROR", "Phản hồi rỗng từ server");
+                        return Response.error(new ParseError(new Exception("Phản hồi rỗng từ server")));
+                    }
+
+                    // Kiểm tra định dạng JSON
+                    if (jsonString.startsWith("{") && jsonString.endsWith("}")) {
+                        return Response.success(new JSONObject(jsonString), HttpHeaderParser.parseCacheHeaders(response));
+                    } else {
+                        Log.e("ERROR", "Định dạng JSON không hợp lệ: " + jsonString);
+                        return Response.error(new ParseError(new JSONException("Định dạng JSON không hợp lệ")));
+                    }
+                } catch (JSONException e) {
+                    Log.e("ERROR", "JSONException: ", e);
+                    // Trả về phản hồi lỗi hoặc xử lý theo cách khác
+                    return Response.error(new ParseError(e));
+                } catch (UnsupportedEncodingException e) {
+                    Log.e("ERROR", "UnsupportedEncodingException: ", e);
+                    return Response.error(new ParseError(e));
+                } catch (Exception e) {
+                    Log.e("ERROR", "Unexpected Error: ", e);
                     return Response.error(new ParseError(e));
                 }
             }
         };
-        AppController.getInstance().addToRequestQueue(stringRequest);
+        if (AppController.getInstance() != null) {
+            AppController.getInstance().addToRequestQueue(stringRequest);
+        } else {
+            Log.e("ERROR", "AppController instance is null");
+        }
     }
 
     public static void algoratham(Context context, JSONObject data) {
@@ -294,22 +341,29 @@ public class PrefManager {
         }
 
         // Kiểm tra kết nối và ID người dùng
-        if (AppController.getInstance().isConnected((AppCompatActivity) context) && !(AppController.getInstance().getId().equals("0"))) {
-            JsonRequest jsonReq = new JsonRequest(Request.Method.POST, Base_Url, null,
+        if (AppController.isConnected((AppCompatActivity) context) && !(AppController.getInstance().getId().equals("0"))) {
+            Log.d("ALGORATHAM", "Connection is available. Preparing to send request.");
+            Log.d("ALGORATHAM", "User ID: " + AppController.getInstance().getId());
+
+            JsonRequest<JSONObject> jsonReq = new JsonRequest<JSONObject>(Request.Method.POST, Base_Url, null,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
+                            Log.d("ALGORATHAM", "Response received: " + response.toString());
+
                             // Xử lý phản hồi từ server
                             if (AppController.getInstance().authorize(response)) {
                                 Intent i = new Intent(context, MainActivity.class);
                                 i.putExtra("new_user", "old");
-                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                context.startActivity(i);
+                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);                                context.startActivity(i);
                                 ((Activity) context).finish();
                             } else {
                                 Intent i = new Intent(context, WelcomeActivity.class);
-                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                context.startActivity(i);
+                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);                                context.startActivity(i);
                                 AppController.getInstance().logout((AppCompatActivity) context);
                                 ((Activity) context).finish();
                             }
@@ -317,6 +371,8 @@ public class PrefManager {
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    Log.e("ALGORATHAM", "Error occurred: " + error.getMessage());
+
                     Intent i = new Intent(context, WelcomeActivity.class);
                     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     context.startActivity(i);
@@ -326,25 +382,30 @@ public class PrefManager {
             }) {
                 @Override
                 protected Map<String, String> getParams() {
+                    Log.d("ALGORATHAM", "Preparing params to send: ");
                     Map<String, String> params = new HashMap<>();
                     params.put(ACCESS_KEY, ACCESS_Value);
                     params.put(GET_USER, API);
                     params.put(ID, "" + AppController.getInstance().getId());
+                    Log.d("ALGORATHAM", "Params: " + params.toString());
                     return params;
                 }
                 @Override
                 protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
                     try {
                         String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+                        Log.d("ALGORATHAM", "Raw response data: " + jsonString);
                         return Response.success(new JSONObject(jsonString), HttpHeaderParser.parseCacheHeaders(response));
                     } catch (UnsupportedEncodingException | JSONException e) {
+                        Log.e("ALGORATHAM", "Parse error: " + e.getMessage());
                         return Response.error(new ParseError(e));
                     }
                 }
             };
-
+            Log.d("ALGORATHAM", "Adding request to queue.");
             AppController.getInstance().addToRequestQueue(jsonReq);
         } else {
+            Log.w("ALGORATHAM", "No connection or invalid user ID. Skipping request.");
             Intent i = new Intent(context, WelcomeActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             context.startActivity(i);
@@ -356,8 +417,7 @@ public class PrefManager {
         String iface = "";
         try {
             for (NetworkInterface networkInterface : Collections.list(NetworkInterface.getNetworkInterfaces())) {
-                if (networkInterface.isUp())
-                    iface = networkInterface.getName();
+                if (networkInterface.isUp()) iface = networkInterface.getName();
                 Log.d("DEBUG", "IFACE NAME: " + iface);
                 if (iface.contains("tun") || iface.contains("ppp") || iface.contains("pptp")) {
                     return true;
@@ -366,7 +426,6 @@ public class PrefManager {
         } catch (SocketException e1) {
             e1.printStackTrace();
         }
-
         return false;
     }
 
@@ -496,12 +555,24 @@ public class PrefManager {
                 try {
                     String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
                     return Response.success(new JSONObject(jsonString), HttpHeaderParser.parseCacheHeaders(response));
-                } catch (UnsupportedEncodingException | JSONException e) {
+                } catch (JSONException e) {
+                    Log.e("ERROR", "JSONException: ", e);
+                    // Trả về phản hồi lỗi hoặc xử lý theo cách khác
+                    return Response.error(new ParseError(e));
+                } catch (UnsupportedEncodingException e) {
+                    Log.e("ERROR", "UnsupportedEncodingException: ", e);
+                    return Response.error(new ParseError(e));
+                } catch (Exception e) {
+                    Log.e("ERROR", "Unexpected Error: ", e);
                     return Response.error(new ParseError(e));
                 }
             }
         };
-        AppController.getInstance().addToRequestQueue(stringRequest);
+        if (AppController.getInstance() != null) {
+            AppController.getInstance().addToRequestQueue(stringRequest);
+        } else {
+            Log.e("ERROR", "AppController instance is null");
+        }
     }
 
     public static void claim_points(Context context) {
@@ -537,12 +608,24 @@ public class PrefManager {
                 try {
                     String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
                     return Response.success(new JSONObject(jsonString), HttpHeaderParser.parseCacheHeaders(response));
-                } catch (UnsupportedEncodingException | JSONException e) {
+                } catch (JSONException e) {
+                    Log.e("ERROR", "JSONException: ", e);
+                    // Trả về phản hồi lỗi hoặc xử lý theo cách khác
+                    return Response.error(new ParseError(e));
+                } catch (UnsupportedEncodingException e) {
+                    Log.e("ERROR", "UnsupportedEncodingException: ", e);
+                    return Response.error(new ParseError(e));
+                } catch (Exception e) {
+                    Log.e("ERROR", "Unexpected Error: ", e);
                     return Response.error(new ParseError(e));
                 }
             }
         };
 
-        AppController.getInstance().addToRequestQueue(stringRequest);
+        if (AppController.getInstance() != null) {
+            AppController.getInstance().addToRequestQueue(stringRequest);
+        } else {
+            Log.e("ERROR", "AppController instance is null");
+        }
     }
 }

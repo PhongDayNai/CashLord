@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
+        android:name=".helper.AppController"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -16,7 +17,74 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CashKing"
-        tools:targetApi="31">
+        tools:targetApi="31"
+        android:networkSecurityConfig="@xml/network_security_config">
+
+        <activity
+            android:name="com.cashlord.earn.FragmentLoadingActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name="com.cashlord.earn.csm.TransActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.cashlord.earn.csm.VisitLinksActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.cashlord.earn.csm.VideoVisitActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.cashlord.earn.csm.VisitActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.cashlord.earn.csm.RefTaskActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.cashlord.earn.csm.OffersActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.cashlord.earn.csm.RedeemActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.cashlord.earn.csm.GameActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.cashlord.earn.csm.VideoActivity"
+            android:exported="false" />
+        <!-- <activity
+            android:name="com.cashlord.earn.csm.OfferWallActivity"
+            android:exported="false" /> -->
+        <activity
+            android:name="com.cashlord.earn.csm.FragViewerActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.cashlord.earn.helper.test"
+            android:exported="false" />
+        <activity
+            android:name="com.cashlord.earn.csm.PlayActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="false" />
+        <activity
+            android:name="com.cashlord.earn.Refer_Activity"
+            android:exported="false" />
+        <activity
+            android:name="com.cashlord.earn.TransactionActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.cashlord.earn.csm.ActivitySplash"
+            android:exported="true"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar.FullScreen">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
@@ -39,28 +107,6 @@
         <meta-data
             android:name="com.onesignal.NotificationChannel"
             android:value="Default" />
-
-        <activity
-            android:name="com.cashlord.earn.csm.ActivitySplash"
-            android:exported="true"
-            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar.FullScreen">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <!-- <activity
-            android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity> -->
     </application>
 
 </manifest>

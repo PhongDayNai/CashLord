@@ -8,27 +8,28 @@ import static com.cashlord.earn.helper.Constatnt.ACCESS_KEY;
 import static com.cashlord.earn.helper.Constatnt.ACCESS_Value;
 import static com.cashlord.earn.helper.Constatnt.API;
 import static com.cashlord.earn.helper.Constatnt.Base_Url;
-import static com.cashlord.earn.helper.PrefManager.setWindowFlag;
+//import static com.cashlord.earn.helper.PrefManager.setWindowFlag;
 
-import android.app.ProgressDialog;
-import android.graphics.Color;
-import android.os.Build;
+//import android.app.ProgressDialog;
+//import android.graphics.Color;
+//import android.os.Build;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
+//import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.cashlord.earn.AdsManager;
+//import com.cashlord.earn.AdsManager;
 import com.cashlord.earn.R;
 import com.cashlord.earn.helper.AppController;
 import com.cashlord.earn.helper.JsonRequest;
@@ -55,12 +56,12 @@ public class Activity_Notification extends AppCompatActivity {
     private RecyclerView listView;
     ActivityListAdapter adapter;
     private List<ActivityItem> historyList = new ArrayList<>();
-    private View root_view;
+    //private View root_view;
     TextView nodata;
     int RecyclerViewItemPosition;
     View view;
     private LinearLayoutManager linearLayoutManager;
-    ProgressDialog Asycdialog;
+    //ProgressDialog Asycdialog;
     ArrayList<String> get_date;
     ArrayList<String> get_title;
     ArrayList<String> get_message;
@@ -73,7 +74,7 @@ public class Activity_Notification extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_activity);
         Window window = this.getWindow();
-        if (Build.VERSION.SDK_INT >= 19 && Build.VERSION.SDK_INT < 21) {
+        /*if (Build.VERSION.SDK_INT >= 19 && Build.VERSION.SDK_INT < 21) {
             setWindowFlag(this, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, true);
         }
         if (Build.VERSION.SDK_INT >= 19) {
@@ -82,11 +83,11 @@ public class Activity_Notification extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= 21) {
             setWindowFlag(this, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, false);
             getWindow().setStatusBarColor(Color.TRANSPARENT);
-        }
+        }*/
         //AdsManager.loadBannerAd(this, findViewById(R.id.banner_ad_container));
-        listView = (RecyclerView) findViewById(R.id.listview);
+        listView = findViewById(R.id.listview);
         linearLayoutManager = new LinearLayoutManager(getContext);
-        nodata = (TextView) findViewById(R.id.nodata);
+        nodata = findViewById(R.id.nodata);
         get_date = new ArrayList<>();
         get_title = new ArrayList<>();
         get_message = new ArrayList<>();
@@ -107,15 +108,14 @@ public class Activity_Notification extends AppCompatActivity {
             GestureDetector gestureDetector = new GestureDetector(getContext, new GestureDetector.SimpleOnGestureListener() {
 
                 @Override
-                public boolean onSingleTapUp(MotionEvent motionEvent) {
-
+                public boolean onSingleTapUp(@NonNull MotionEvent motionEvent) {
                     return true;
                 }
 
             });
 
             @Override
-            public boolean onInterceptTouchEvent(RecyclerView Recyclerview, MotionEvent motionEvent) {
+            public boolean onInterceptTouchEvent(@NonNull RecyclerView Recyclerview, @NonNull MotionEvent motionEvent) {
 
                 view = Recyclerview.findChildViewUnder(motionEvent.getX(), motionEvent.getY());
 
@@ -129,17 +129,11 @@ public class Activity_Notification extends AppCompatActivity {
             }
 
             @Override
-            public void onTouchEvent(RecyclerView Recyclerview, MotionEvent motionEvent) {
-
-            }
+            public void onTouchEvent(@NonNull RecyclerView Recyclerview, @NonNull MotionEvent motionEvent) {}
 
             @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-            }
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {}
         });
-
-
     }
 
     public void full_details1(String get_title, String get_message, String get_date) {
@@ -165,7 +159,6 @@ public class Activity_Notification extends AppCompatActivity {
                 VolleyLog.d("TAG", "Response: " + response.toString());
                 if (response != null) {
                     parseJsonFeed(response);
-
                 }
             }
         }, new Response.ErrorListener() {
@@ -225,7 +218,6 @@ public class Activity_Notification extends AppCompatActivity {
 
     @Override
     public void onPause() {
-
         super.onPause();
     }
 

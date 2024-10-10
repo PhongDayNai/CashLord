@@ -1,5 +1,7 @@
 package com.cashlord.earn.csm.gateway;
 
+import android.util.Log;
+
 import androidx.multidex.BuildConfig;
 
 import com.google.gson.Gson;
@@ -12,6 +14,7 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
+
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -25,19 +28,19 @@ public class ServiceWrapper {
     }
 
     public Retrofit getRetrofit(Interceptor mInterceptorheader) {
-        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(message -> {
+            Log.d("HTTP_LOG", message);
+        });
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient mOkHttpClient = null;
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.connectTimeout(Constant.API_CONNECTION_TIMEOUT, TimeUnit.SECONDS);
         builder.readTimeout(Constant.API_READ_TIMEOUT, TimeUnit.SECONDS);
 
-
         if (BuildConfig.DEBUG) {
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             builder.addInterceptor(loggingInterceptor);
         }
-
 
         mOkHttpClient = builder.build();
         Gson gson = new GsonBuilder().setLenient().create();
@@ -51,6 +54,9 @@ public class ServiceWrapper {
 
     public Call<String> newHashCall( String key, String txtid,String amount, String productinfo,
                                      String fullname, String email){
+        Log.d("API_CALL", "Sending request to server with params: " +
+                "key: " + key + ", txtid: " + txtid + ", amount: " + amount +
+                ", productinfo: " + productinfo + ", fullname: " + fullname + ", email: " + email);
         return mServiceInterface.getHashCall(
                 convertPlainString(key),   convertPlainString(txtid),convertPlainString(amount),
                 convertPlainString(productinfo), convertPlainString( fullname),  convertPlainString(email));

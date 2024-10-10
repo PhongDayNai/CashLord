@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -152,6 +153,7 @@ public class FragmentProfile extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
+                Log.e("ON_ERROR_Fragment_Profile", "onErrorResponse: ", error);
             }
         }) {
             @Override

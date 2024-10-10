@@ -252,7 +252,7 @@ public class Activity_otp extends AppCompatActivity {
                                                 @Override
                                                 public void onErrorResponse(VolleyError error) {
                                                     ContextExtensions.showLongToast(context, context.getText(R.string.error_data_loading).toString());
-
+                                                    Log.e("ON_ERROR_Activity_otp", "onErrorResponse: ", error);
                                                 }
                                             }) {
 
@@ -288,6 +288,7 @@ public class Activity_otp extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        Log.e("ON_ERROR_Activity_otp", "onErrorResponse: ", error);
                     }
                 }) {
             @Override
@@ -349,6 +350,7 @@ public class Activity_otp extends AppCompatActivity {
                 public void onErrorResponse(VolleyError error) {
                     ContextExtensions.showLongToast(getApplicationContext(), getText(R.string.error_data_loading).toString());
                     hidepDialog();
+                    Log.e("ON_ERROR_Activity_otp", "onErrorResponse: ", error);
                 }
             }) {
 
@@ -393,6 +395,7 @@ public class Activity_otp extends AppCompatActivity {
                 public void onErrorResponse(VolleyError error) {
                     ContextExtensions.showLongToast(getApplicationContext(), error.toString());
                     hidepDialog();
+                    Log.e("ON_ERROR_Activity_otp", "onErrorResponse: ", error);
                 }
             }) {
                 @Override
@@ -440,6 +443,7 @@ public class Activity_otp extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        Log.e("ON_ERROR_Activity_otp", "onErrorResponse: ", error);
                     }
                 }) {
             @Override
@@ -503,6 +507,7 @@ public class Activity_otp extends AppCompatActivity {
                                 @Override
                                 public void onErrorResponse(VolleyError error) {
                                     hidepDialog();
+                                    Log.e("ON_ERROR_Activity_otp", "onErrorResponse: ", error);
                                 }
                             }) {
                         @Override

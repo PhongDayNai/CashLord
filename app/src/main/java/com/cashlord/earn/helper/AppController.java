@@ -180,6 +180,7 @@ public class AppController extends Application {
                         }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        Log.e("ON_ERROR_AppController", "onErrorResponse: ", error);
                     }
                 }) {
 

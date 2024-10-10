@@ -7,7 +7,7 @@ public class Constant {
     public static String TAG ="mainActivity", txnid ="txt12346",
             prodname ="WEB Buy Coin",
             merchantId ="7174458", merchantkey="Q95x4CBD";  //   first test key only
-    public static final String BASE_URL =   "http://mmo.nguyenductien.net/";   // https://www your domain .com/
+    public static final String BASE_URL =   "https://mmo.nguyenductien.net/";   // https://www your domain .com/
 
 
 }

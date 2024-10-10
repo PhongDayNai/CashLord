@@ -34,6 +34,14 @@ android {
             )
         }
     }
+
+    lint {
+        abortOnError = false
+        warningsAsErrors = true
+        disable.add("Deprecation")
+        disable.add("Unchecked")
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
