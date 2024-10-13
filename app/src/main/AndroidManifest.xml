@@ -2,10 +2,34 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> -->
+
+    <uses-permission
+        android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+    <uses-permission
+        android:name="android.permission.ACCESS_WIFI_STATE"
+        tools:node="remove" />
+    <uses-permission android:name="android.permission.Ad_ID" />
+    <uses-permission
+        android:name="android.permission.REQUEST_INSTALL_PACKAGES"
+        tools:node="remove" />
 
     <application
         android:name=".helper.AppController"
@@ -43,9 +67,9 @@
         <activity
             android:name="com.cashlord.earn.csm.RefTaskActivity"
             android:exported="false" />
-        <activity
+        <!-- <activity
             android:name="com.cashlord.earn.csm.OffersActivity"
-            android:exported="false" />
+            android:exported="false" /> -->
         <activity
             android:name="com.cashlord.earn.csm.RedeemActivity"
             android:exported="false" />
@@ -85,6 +109,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".csm.MainActivity" />
+        <activity
+            android:name=".Activity_Login"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar.FullScreen" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
@@ -100,6 +128,32 @@
             android:value="OWtU1q845P4UdcDuFrM4Mz1BEdsn5UgzT1ly14TTRmW7TXxTqObXUQhscppTb05vszTXmMG2GUgeSBkoARH5xW" />
             <!-- android:value="FsFGfiHBrph8vVPEZ8TbVlSRmdRWz8yhDCrR47HxWus9EzSmWy9qDwgKxkPaxsKf3cbd6h_TGoGI40fehXk9Af" -->
 
+        <activity
+            android:name=".WelcomeActivity"
+            android:label="@string/title_activity_welcome"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar.FullScreen" />
+        <activity
+            android:name=".luck_draw.Activity_Notification" />
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name" />
+        <activity
+            android:name="com.facebook.CustomTabActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="@string/fb_login_protocol_scheme" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".csm.InstallActivity"
+            android:exported="false" />
+
         <meta-data
             android:name="com.onesignal.NotificationOpenedHandler"
             android:value="com.cashlord.earn" />
@@ -107,6 +161,14 @@
         <meta-data
             android:name="com.onesignal.NotificationChannel"
             android:value="Default" />
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
+        <meta-data
+            android:name="com.facebook.sdk.ClientToken"
+            android:value="@string/facebook_client_token" />
     </application>
 
 </manifest>

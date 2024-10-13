@@ -87,8 +87,8 @@ public class AppController extends Application {
         super.onCreate();
         mInstance = this;
         sharedPref = this.getSharedPreferences(getString(R.string.settings_file), Context.MODE_PRIVATE);
-        OneSignal.initWithContext(this);
-        OneSignal.setAppId(getString(R.string.one_signal_app_id));
+        //OneSignal.initWithContext(this);
+        //OneSignal.setAppId(getString(R.string.one_signal_app_id));
         this.readData();
         FirebaseApp.initializeApp(this);
     }

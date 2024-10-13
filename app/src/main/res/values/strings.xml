@@ -2,7 +2,7 @@
     <!--App Name-->
     <string name="app_name">Cash King</string>
 
-    <string name="default_web_client_id"></string>
+    <string name="default_web_client_id">1017685413067-6t621v3f6emi05f6co78qj2curbe8b3v.apps.googleusercontent.com</string>
 
     <string name="next">Next</string>
     <string name="skip">Skip</string>

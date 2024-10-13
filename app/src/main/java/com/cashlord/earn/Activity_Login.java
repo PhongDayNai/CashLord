@@ -24,6 +24,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -54,6 +55,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.text.HtmlCompat;
 
+import com.android.volley.toolbox.StringRequest;
 import com.cashlord.earn.R;
 import com.cashlord.earn.helper.AppController;
 import com.cashlord.earn.helper.ContextExtensions;
@@ -91,6 +93,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 public class Activity_Login extends AppCompatActivity {
 
@@ -333,16 +336,18 @@ public class Activity_Login extends AppCompatActivity {
     public void check_user(String e, String password1,boolean isCustomLogin) {
         showpDialog();
         if (isConnected(Activity_Login.this)) {
-            JsonRequest jsonReq = new JsonRequest(Request.Method.POST, Base_Url, null,
-                    new Response.Listener<JSONObject>() {
+            //JsonRequest jsonReq = new JsonRequest(Request.Method.POST, Base_Url, null,
+            StringRequest jsonReq = new StringRequest(Request.Method.POST, Base_Url,
+                    new Response.Listener<String>() {
                         @Override
-                        public void onResponse(JSONObject response) {
+                        public void onResponse(String response) {
                             try {
-                                if (response.getString("error").equalsIgnoreCase("false")) {
+                                JSONObject jsonResponse = new JSONObject(response);
+                                if (jsonResponse.getString("error").equalsIgnoreCase("false")) {
                                     account_status = 1;
                                     signin(email,password1);
 
-                                } else if (response.getString("error").equalsIgnoreCase("true")) {
+                                } else if (jsonResponse.getString("error").equalsIgnoreCase("true")) {
                                     account_status = 2;
                                     if (isCustomLogin) {
                                         hidepDialog();
@@ -362,7 +367,7 @@ public class Activity_Login extends AppCompatActivity {
                 public void onErrorResponse(VolleyError error) {
                     ContextExtensions.showLongToast(getApplicationContext(), "Check User " + e.toString());
                     hidepDialog();
-                    Log.e("ON_ERROR_Activity_Login", "onErrorResponse: ", error);
+                    Log.e("ON_ERROR_Activity_Login_check_user", "onErrorResponse: ", error);
                 }
             }) {
                 @Override
@@ -371,7 +376,7 @@ public class Activity_Login extends AppCompatActivity {
                     params.put(ACCESS_KEY, ACCESS_Value);
                     params.put("user_check", API);
                     params.put("phone", e);
-                    Log.e("Error", "phone :" + password1);
+                    Log.e("Error", "phone:" + password1);
                     return params;
                 }
             };
@@ -465,7 +470,18 @@ public class Activity_Login extends AppCompatActivity {
     }
 
     public void register(final String enter_phone, final String username, final String name, final String email, final Uri pro) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        // Sử dụng SharedPreferences để lấy hoặc tạo UUID duy nhất cho thiết bị
+        SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String uniqueID = prefs.getString("unique_id", null);
+
+        if (uniqueID == null) {
+            uniqueID = UUID.randomUUID().toString(); // Tạo UUID mới
+            prefs.edit().putString("unique_id", uniqueID).apply(); // Lưu UUID vào SharedPreferences
+        }
+
+        final String androidId = uniqueID; // Sử dụng UUID làm androidId
+
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             androidId = Settings.Secure.getString(
                     getContentResolver(),
                     Settings.Secure.ANDROID_ID);
@@ -484,18 +500,19 @@ public class Activity_Login extends AppCompatActivity {
             if (androidId == null) {
                 androidId = " ";
             }
-        }
+        }*/
         if (isConnected(Activity_Login.this)) {
             showpDialog();
-            JsonRequest jsonReq = new JsonRequest(Request.Method.POST, Base_Url, null,
-                    new Response.Listener<JSONObject>() {
+            //JsonRequest jsonReq = new JsonRequest(Request.Method.POST, Base_Url, null,
+            StringRequest jsonReq = new StringRequest(Request.Method.POST, Base_Url,
+                    new Response.Listener<String>() {
                         @Override
-                        public void onResponse(JSONObject response) {
-
+                        public void onResponse(String response) {
                             try {
-                                if (response.getString("error").equalsIgnoreCase("true")) {
-                                    ContextExtensions.showLongToast(getApplicationContext(), response.getString("message"));
-                                } else if (response.getString("error").equalsIgnoreCase("false")) {
+                                JSONObject jsonResponse = new JSONObject(response);
+                                if (jsonResponse.getString("error").equalsIgnoreCase("true")) {
+                                    ContextExtensions.showLongToast(getApplicationContext(), jsonResponse.getString("message"));
+                                } else if (jsonResponse.getString("error").equalsIgnoreCase("false")) {
                                     signin(email, "");
                                 }
                             } catch (JSONException e) {
@@ -505,9 +522,9 @@ public class Activity_Login extends AppCompatActivity {
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    ContextExtensions.showLongToast(getApplicationContext(),"Please check your internet connection!");
-                    hidepDialog();
-                    Log.e("ON_ERROR_Activity_Login", "onErrorResponse: ", error);
+                    //ContextExtensions.showLongToast(getApplicationContext(),"Please check your internet connection!");
+                    //hidepDialog();
+                    Log.e("ON_ERROR_Activity_Login_register", "onErrorResponse: ", error);
                 }
             }) {
                 @Override
@@ -530,9 +547,7 @@ public class Activity_Login extends AppCompatActivity {
         }
     }
 
-
     public void signin(final String enter_phone, String password) {
-
         if (isConnected(Activity_Login.this)) {
             showpDialog();
             JsonRequest jsonReq = new JsonRequest(Request.Method.POST, Base_Url, null,
@@ -572,7 +587,7 @@ public class Activity_Login extends AppCompatActivity {
                 public void onErrorResponse(VolleyError error) {
                     ContextExtensions.showShortToast(getApplicationContext(), getText(R.string.error_data_loading).toString());
                     hidepDialog();
-                    Log.e("ON_ERROR_Activity_Login", "onErrorResponse: ", error);
+                    Log.e("ON_ERROR_Activity_Login_signin", "onErrorResponse: ", error);
                 }
             }) {
                 @Override

@@ -12,7 +12,20 @@
           "package_name": "com.cashlord.earn"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1017685413067-euqdpfdgpf9kjik499st88590ah5us4d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cashlord.earn",
+            "certificate_hash": "6be700953c24593ef1d7e9be7d589d80b608d5de"
+          }
+        },
+        {
+          "client_id": "1017685413067-6t621v3f6emi05f6co78qj2curbe8b3v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDURmXmiuocdXKmN0qqDuXSt6XzVza73Ds"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1017685413067-6t621v3f6emi05f6co78qj2curbe8b3v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -3,6 +3,8 @@ package com.cashlord.earn.csm.fragment;
 import static com.cashlord.earn.Activity_otp.randomAlphaNumeric;
 import static com.cashlord.earn.helper.PrefManager.activity;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -17,6 +19,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
 
 import com.android.volley.Request;
+import com.android.volley.toolbox.StringRequest;
 import com.cashlord.earn.Activity_otp;
 import com.cashlord.earn.R;
 import com.cashlord.earn.helper.AppController;
@@ -26,9 +29,11 @@ import com.cashlord.earn.helper.JsonRequest;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * A simple [Fragment] subclass.
@@ -122,31 +127,28 @@ public class SignupFragment extends Fragment {
     }
 
     public void register(String enter_phone, String username, String name, String email, Uri pro, String password) {
-        String tempAndroidId;
-        tempAndroidId = Settings.Secure.getString(requireActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            tempAndroidId = Settings.Secure.getString(requireActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
-            if (tempAndroidId == null) {
-                tempAndroidId = " ";
-            }
-        } else {
-            TelephonyManager mTelephony = (TelephonyManager) requireActivity().getSystemService(Context.TELEPHONY_SERVICE);
-            tempAndroidId = (mTelephony.getDeviceId() != null) ? mTelephony.getDeviceId() : Settings.Secure.getString(requireActivity().getContentResolver(), Settings.Secure.ANDROID_ID);*/
-            if (tempAndroidId == null) {
-                tempAndroidId = " ";
-            }
-        //}
+        // Sử dụng SharedPreferences để lấy hoặc tạo UUID duy nhất cho thiết bị
+        SharedPreferences prefs = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String uniqueID = prefs.getString("unique_id", null);
 
-        final String androidId = tempAndroidId;
+        if (uniqueID == null) {
+            uniqueID = UUID.randomUUID().toString(); // Tạo UUID mới
+            prefs.edit().putString("unique_id", uniqueID).apply(); // Lưu UUID vào SharedPreferences
+        }
+
+        final String androidId = uniqueID; // Sử dụng UUID làm androidId
 
         if (AppController.isConnected((AppCompatActivity) requireActivity())) {
             AppController.showpDialog();
-            JsonRequest jsonReq = new JsonRequest(Request.Method.POST, Constatnt.Base_Url, null,
+            //JsonRequest jsonReq = new JsonRequest(Request.Method.POST, Constatnt.Base_Url, null,
+            StringRequest jsonReq = new StringRequest(Request.Method.POST, Constatnt.Base_Url,
                     response -> {
                         try {
-                            if (response.getString("error").equalsIgnoreCase("true")) {
-                                Toast.makeText(requireActivity(), response.getString("message"), Toast.LENGTH_LONG).show();
-                            } else if (response.getString("error").equalsIgnoreCase("false")) {
+                            Log.e("RESPONSE", "register: " + response.toString());
+                            JSONObject jsonResponse = new JSONObject(response);
+                            if (jsonResponse.getString("error").equalsIgnoreCase("true")) {
+                                Toast.makeText(requireActivity(), jsonResponse.getString("message"), Toast.LENGTH_LONG).show();
+                            } else if (jsonResponse.getString("error").equalsIgnoreCase("false")) {
                                 signin(email, password);
                             }
                         } catch (JSONException ex) {
@@ -160,6 +162,7 @@ public class SignupFragment extends Fragment {
                     }) {
                 @Override
                 protected Map<String, String> getParams() {
+                    Log.d("SignUp_PARAMS", "Calling getParams function");
                     Map<String, String> params = new HashMap<>();
                     params.put(Constatnt.ACCESS_KEY, Constatnt.ACCESS_Value);
                     params.put("user_signup", Constatnt.API);
@@ -171,6 +174,7 @@ public class SignupFragment extends Fragment {
                     params.put("refer", randomAlphaNumeric(8));
                     params.put("device", androidId);
                     params.put("image", pro.toString());
+                    Log.d("REQUEST_PARAMS", "Params: " + params.toString());
                     return params;
                 }
             };

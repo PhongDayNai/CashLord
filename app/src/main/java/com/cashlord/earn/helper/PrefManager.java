@@ -44,6 +44,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.JsonRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.cashlord.earn.MainActivity;
 import com.cashlord.earn.OnScratchComplete;
 import com.cashlord.earn.R;
@@ -120,6 +121,7 @@ public class PrefManager {
     }
 
     public static void setWindowFlag(Activity activity, final int bits, boolean on) {
+        Log.d("PrefManager", "Calling setWindowFlag function");
         Window win = activity.getWindow();
         WindowManager.LayoutParams winParams = win.getAttributes();
         if (on) {
@@ -131,6 +133,7 @@ public class PrefManager {
     }
 
     public static void setString(Context context, String key, String prefString) {
+        Log.d("PrefManager", "Calling setString function");
         SharedPreferences sharedPreferences = context.getSharedPreferences(SETTING_PREF, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(key, prefString);
@@ -155,6 +158,7 @@ public class PrefManager {
     }
 
     public static void Add_Coins_(Context context, String coins, String from, String showAd, OnScratchComplete onScratchComplete) {
+        Log.d("PrefManager", "Calling Add_Coins_ function");
         FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
         Coins_Dialog newFragment = new Coins_Dialog();
         Bundle args = new Bundle();
@@ -170,15 +174,18 @@ public class PrefManager {
     }
 
     public static void user_points(TextView t) {
+        Log.d("PrefManager", "Calling user_points function");
         final String[] s = {"0"};
-        JsonRequest<JSONObject> stringRequest = new JsonRequest<JSONObject>(Request.Method.POST, Base_Url, null,
-                new Response.Listener<JSONObject>() {
+        //JsonRequest<JSONObject> stringRequest = new JsonRequest<JSONObject>(Request.Method.POST, Base_Url, null,
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Base_Url,
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onResponse(String response) {
                         try {
-                            if (response.getString("error").equalsIgnoreCase("false")) {
-                                t.setText(response.getString("points"));
-                            } else {}
+                            JSONObject jsonResponse = new JSONObject(response);
+                            if (jsonResponse.getString("error").equalsIgnoreCase("false")) {
+                                t.setText(jsonResponse.getString("points"));
+                            } //else {}
                         } catch (Exception e) {
                             ContextExtensions.showLongToast(t.getContext(), e.getMessage());
                         }
@@ -195,7 +202,7 @@ public class PrefManager {
                 params.put("get_points", AppController.getInstance().getId());
                 return params;
             }
-            @Override
+            /*@Override
             protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
                 try {
                     String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
@@ -211,7 +218,7 @@ public class PrefManager {
                     Log.e("ERROR", "Unexpected Error: ", e);
                     return Response.error(new ParseError(e));
                 }
-            }
+            }*/
         };
         if (AppController.getInstance() != null) {
             AppController.getInstance().addToRequestQueue(stringRequest);
@@ -235,23 +242,45 @@ public class PrefManager {
     }
 
     public static void A(Context context) {
-        JsonRequest<JSONObject> stringRequest = new JsonRequest<JSONObject>(Request.Method.POST, Base_Url, null,
-                new Response.Listener<JSONObject>() {
+        Log.d("PrefManager", "Calling A function");
+
+        if (!AppController.isConnected((AppCompatActivity) context)) {
+            Log.e("ERROR", "No internet connection");
+            return;  // Dừng lại nếu không có kết nối
+        } else {
+            Log.d("NETWORK", "Internet is available");
+        }
+
+        // Tạo một Map để chứa tham số
+        /*Map<String, String> params = new HashMap<>();
+        params.put(ACCESS_KEY, ACCESS_Value);
+        params.put("c", DAILY_TYPE);
+        String stringParams = params.toString();*/
+
+        //JSONObject jsonParams = new JSONObject(params);
+
+        //JsonRequest<JSONObject> stringRequest = new JsonRequest<JSONObject>(Request.Method.POST, Base_Url, params,
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Base_Url,
+        //JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.POST, Base_Url, null,
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onResponse(String response) {
+                        Log.d("ON_RESPONSE", "Calling onResponse function");
                         try {
-                            if (response.getString("error").equalsIgnoreCase("1")) {
-                                if (response.getString("vpn").equals("1")) {
+                            JSONObject jsonResponse = new JSONObject(response);
+                            if (jsonResponse.getString("error").equalsIgnoreCase("1")) {
+                                Log.d("CHECK_ERROR", "Error is 1, processing further...");
+                                if (jsonResponse.getString("vpn").equals("1")) {
                                     if (vpn()) {
                                         ContextExtensions.showShortToast(context, "Please disconnect the vpn and reopen the app!");
                                         ((Activity) context).finish();
                                     } else {
-                                        Log.d("ALGORATHAM", "Calling algoratham with data: " + response.getJSONObject("data").toString());
-                                        algoratham(context, response.getJSONObject("data"));
+                                        Log.d("ALGORATHAM", "Calling algoratham with data: " + jsonResponse.getJSONObject("data").toString());
+                                        algoratham(context, jsonResponse.getJSONObject("data"));
                                     }
                                 } else {
-                                    Log.d("ALGORATHAM", "Calling algoratham with data: " + response.getJSONObject("data").toString());
-                                    algoratham(context, response.getJSONObject("data"));
+                                    Log.d("ALGORATHAM", "Calling algoratham with data: " + jsonResponse.getJSONObject("data").toString());
+                                    algoratham(context, jsonResponse.getJSONObject("data"));
                                 }
                             }
                         } catch (Exception e) {}
@@ -261,6 +290,10 @@ public class PrefManager {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e("ON_ERROR_help_PrefManager_A", "onErrorResponse: " + error.getMessage());
+                        if (error.networkResponse != null) {
+                            Log.e("ON_ERROR_help_PrefManager_A", "Status Code: " + error.networkResponse.statusCode);
+                            Log.e("ON_ERROR_help_PrefManager_A", "Response Data: " + new String(error.networkResponse.data));
+                        }
                         Log.e("ON_ERROR_help_PrefManager_A", "onErrorResponse: ", error);
                     }
                 }) {
@@ -269,12 +302,13 @@ public class PrefManager {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put(ACCESS_KEY, ACCESS_Value);
                 params.put("c", DAILY_TYPE);
+                Log.d("REQUEST_PARAMS", "Params: " + params.toString());
                 return params;
             }
-            @Override
+            /*@Override
             protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
                 try {
-                    String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers, "UTF-8"));
+                    String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
                     Log.d("RESPONSE", "Response: " + jsonString);  // Log toàn bộ phản hồi từ server
 
                     int statusCode = response.statusCode;
@@ -309,16 +343,20 @@ public class PrefManager {
                     Log.e("ERROR", "Unexpected Error: ", e);
                     return Response.error(new ParseError(e));
                 }
-            }
+            }*/
         };
         if (AppController.getInstance() != null) {
             AppController.getInstance().addToRequestQueue(stringRequest);
+            Log.d("REQUEST", "Request added to queue");
         } else {
             Log.e("ERROR", "AppController instance is null");
         }
+
+        //AppController.getInstance().addToRequestQueue(stringRequest);
     }
 
     public static void algoratham(Context context, JSONObject data) {
+        Log.d("PrefManager", "Calling algoratham function");
         try {
             // Lưu các ID quảng cáo vào SharedPreferences
             setString(context, APPLOVIN_MAX_INTERSTITIAL_ID, data.getString("applovin_max_interstitial_id"));
@@ -345,27 +383,31 @@ public class PrefManager {
             Log.d("ALGORATHAM", "Connection is available. Preparing to send request.");
             Log.d("ALGORATHAM", "User ID: " + AppController.getInstance().getId());
 
-            JsonRequest<JSONObject> jsonReq = new JsonRequest<JSONObject>(Request.Method.POST, Base_Url, null,
-                    new Response.Listener<JSONObject>() {
+            //JsonRequest<JSONObject> jsonReq = new JsonRequest<JSONObject>(Request.Method.POST, Base_Url, null,
+            StringRequest stringReq = new StringRequest(Request.Method.POST, Base_Url,
+                    new Response.Listener<String>() {
                         @Override
-                        public void onResponse(JSONObject response) {
+                        public void onResponse(String response) {
                             Log.d("ALGORATHAM", "Response received: " + response.toString());
 
                             // Xử lý phản hồi từ server
-                            if (AppController.getInstance().authorize(response)) {
-                                Intent i = new Intent(context, MainActivity.class);
-                                i.putExtra("new_user", "old");
-                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);                                context.startActivity(i);
-                                ((Activity) context).finish();
-                            } else {
-                                Intent i = new Intent(context, WelcomeActivity.class);
-                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);                                context.startActivity(i);
-                                AppController.getInstance().logout((AppCompatActivity) context);
-                                ((Activity) context).finish();
+                            try {
+                                JSONObject jsonResponse = new JSONObject(response);
+                                if (AppController.getInstance().authorize(jsonResponse)) {
+                                    Intent i = new Intent(context, MainActivity.class);
+                                    i.putExtra("new_user", "old");
+                                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    context.startActivity(i);
+                                    ((Activity) context).finish();
+                                } else {
+                                    Intent i = new Intent(context, WelcomeActivity.class);
+                                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    context.startActivity(i);
+                                    AppController.getInstance().logout((AppCompatActivity) context);
+                                    ((Activity) context).finish();
+                                }
+                            } catch (JSONException e) {
+                                Log.e("ALGORATHAM", "JSON parsing error: " + e.getMessage());
                             }
                         }
                     }, new Response.ErrorListener() {
@@ -390,7 +432,7 @@ public class PrefManager {
                     Log.d("ALGORATHAM", "Params: " + params.toString());
                     return params;
                 }
-                @Override
+                /*@Override
                 protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
                     try {
                         String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
@@ -400,20 +442,23 @@ public class PrefManager {
                         Log.e("ALGORATHAM", "Parse error: " + e.getMessage());
                         return Response.error(new ParseError(e));
                     }
-                }
+                }*/
             };
             Log.d("ALGORATHAM", "Adding request to queue.");
-            AppController.getInstance().addToRequestQueue(jsonReq);
+            AppController.getInstance().addToRequestQueue(stringReq);
         } else {
-            Log.w("ALGORATHAM", "No connection or invalid user ID. Skipping request.");
+            Log.w("ALGORATHAM", "Invalid user ID.");
             Intent i = new Intent(context, WelcomeActivity.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             context.startActivity(i);
             ((Activity) context).finish();
         }
     }
 
     public static boolean vpn() {
+        Log.d("PrefManager", "Calling vpn function");
         String iface = "";
         try {
             for (NetworkInterface networkInterface : Collections.list(NetworkInterface.getNetworkInterfaces())) {
@@ -431,8 +476,8 @@ public class PrefManager {
 
 
     public static void check_n(Context context, Activity activity) {
+        Log.d("PrefManager", "Calling check_n function");
         if (isConnected(context)) {
-
         } else {
             // Create the object of
             // AlertDialog Builder class
@@ -456,44 +501,33 @@ public class PrefManager {
             // OnClickListener method is use of
             // DialogInterface interface.
 
-            builder
-                    .setPositiveButton(
-                            "Retry",
-                            new DialogInterface
-                                    .OnClickListener() {
+            builder.setPositiveButton("Retry",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
-                                @Override
-                                public void onClick(DialogInterface dialog,
-                                                    int which) {
-
-                                    // When the user click yes button
-                                    // then app will close
-                                    dialog.dismiss();
-                                    Intent i = new Intent(context, ActivitySplash.class);
-                                    context.startActivity(i);
-                                    activity.finish();
-
-                                }
-                            });
+                            // When the user click yes button
+                            // then app will close
+                            dialog.dismiss();
+                            Intent i = new Intent(context, ActivitySplash.class);
+                            context.startActivity(i);
+                            activity.finish();
+                        }
+                    });
 
             // Set the Negative button with No name
             // OnClickListener method is use
             // of DialogInterface interface.
-            builder
-                    .setNegativeButton(
-                            "Exit",
-                            new DialogInterface
-                                    .OnClickListener() {
+            builder.setNegativeButton("Exit",
+                    new DialogInterface.OnClickListener() {
 
-                                @Override
-                                public void onClick(DialogInterface dialog,
-                                                    int which) {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
-                                    activity.finishAffinity();
-                                    System.exit(0);
-
-                                }
-                            });
+                            activity.finishAffinity();
+                            System.exit(0);
+                        }
+                    });
 
             // Create the Alert dialog
             AlertDialog alertDialog = builder.create();
@@ -504,6 +538,7 @@ public class PrefManager {
     }
 
     public static boolean isConnected(Context context) {
+        Log.d("PrefManager", "Calling isConnected function");
         boolean connected = false;
         try {
             ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -517,19 +552,22 @@ public class PrefManager {
     }
 
     public static void redeem_package(final Context contextt, String package_id, String p_details, String amount_id) {
+        Log.d("PrefManager", "Calling redeem_package function");
         Dialog dialogg = new Dialog(contextt);
         dialogg.setContentView(R.layout.loading);
         dialogg.getWindow().setBackgroundDrawable(new ColorDrawable
                 (Color.TRANSPARENT));
         dialogg.setCancelable(false);
         dialogg.show();
-        JsonRequest stringRequest = new JsonRequest(Request.Method.POST, Base_Url, null,
-                new Response.Listener<JSONObject>() {
+        //JsonRequest<JSONObject> stringRequest = new JsonRequest<JSONObject>(Request.Method.POST, Base_Url, null,
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Base_Url,
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onResponse(String response) {
                         try {
+                            JSONObject jsonResponse = new JSONObject(response);
                             dialogg.dismiss();
-                            ContextExtensions.showShortToast(contextt, response.getString("message"));
+                            ContextExtensions.showShortToast(contextt, jsonResponse.getString("message"));
                         } catch (Exception e) {
                             dialogg.dismiss();
                         }
@@ -550,7 +588,7 @@ public class PrefManager {
                 params.put("amount_id", amount_id);
                 return params;
             }
-            @Override
+            /*@Override
             protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
                 try {
                     String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
@@ -566,7 +604,7 @@ public class PrefManager {
                     Log.e("ERROR", "Unexpected Error: ", e);
                     return Response.error(new ParseError(e));
                 }
-            }
+            }*/
         };
         if (AppController.getInstance() != null) {
             AppController.getInstance().addToRequestQueue(stringRequest);
@@ -576,13 +614,16 @@ public class PrefManager {
     }
 
     public static void claim_points(Context context) {
-        JsonRequest stringRequest = new JsonRequest(Request.Method.POST, Base_Url, null,
-                new Response.Listener<JSONObject>() {
+        Log.d("PrefManager", "Calling claim_points function");
+        //JsonRequest<JSONObject> stringRequest = new JsonRequest<JSONObject>(Request.Method.POST, Base_Url, null,
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Base_Url,
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onResponse(String response) {
                         try {
-                            if (response.getString("error").equalsIgnoreCase("false")) {
-                                String p = response.getString("points");
+                            JSONObject jsonResponse = new JSONObject(response);
+                            if (jsonResponse.getString("error").equalsIgnoreCase("false")) {
+                                String p = jsonResponse.getString("points");
                                 Add_Coins_(context, p, "Daily checkin bonus", "true", null);
                             } else {
                                 ContextExtensions.showShortToast(context, "You've already claim your daily bonus!");
@@ -603,7 +644,7 @@ public class PrefManager {
                 params.put(SPIN_TYPE, DAILY_TYPE);
                 return params;
             }
-            @Override
+            /*@Override
             protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
                 try {
                     String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
@@ -619,7 +660,7 @@ public class PrefManager {
                     Log.e("ERROR", "Unexpected Error: ", e);
                     return Response.error(new ParseError(e));
                 }
-            }
+            }*/
         };
 
         if (AppController.getInstance() != null) {
