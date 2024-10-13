@@ -285,7 +285,6 @@ public class Activity_Login extends AppCompatActivity {
                         } catch (ApiException e) {
                             // Google Sign In failed, update UI appropriately
                             Log.w(TAG, "Google sign in failed", e);
-
                         }
                     } else {
                         ContextExtensions.showShortToast(Activity_Login.this, "Google sign in failed");
@@ -452,7 +451,7 @@ public class Activity_Login extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = firebaseAuth.getCurrentUser();
-                            Log.d(TAG, "signInWithCredential:success: currentUser: " + user.getEmail());
+                            Log.d(TAG, "signInWithCredential: success: currentUser: " + user.getEmail());
                             email = user.getEmail();
                             name = user.getDisplayName();
                             profile = user.getPhotoUrl();
@@ -481,26 +480,6 @@ public class Activity_Login extends AppCompatActivity {
 
         final String androidId = uniqueID; // Sử dụng UUID làm androidId
 
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            androidId = Settings.Secure.getString(
-                    getContentResolver(),
-                    Settings.Secure.ANDROID_ID);
-            if (androidId == null) {
-                androidId = " ";
-            }
-        } else {
-            final TelephonyManager mTelephony = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-            if (mTelephony.getDeviceId() != null) {
-                androidId = mTelephony.getDeviceId();
-            } else {
-                androidId = Settings.Secure.getString(
-                        getContentResolver(),
-                        Settings.Secure.ANDROID_ID);
-            }
-            if (androidId == null) {
-                androidId = " ";
-            }
-        }*/
         if (isConnected(Activity_Login.this)) {
             showpDialog();
             //JsonRequest jsonReq = new JsonRequest(Request.Method.POST, Base_Url, null,
@@ -540,6 +519,7 @@ public class Activity_Login extends AppCompatActivity {
                     params.put("refer", code);
                     params.put("device", androidId);
                     params.put("image", String.valueOf(pro));
+                    Log.d("params", params.toString());
                     return params;
                 }
             };
